@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Plate Detection</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.top-container {
+  background-color: #f1f1f1;
+  padding: 25px;
+  text-align: center;
+}
+
+.header {
+  padding: 10px 13px;
+  background: #555;
+  color: #f1f1f1;
+}
+
+.footer {
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   background-color: #7f00ff ;
+   color: white;
+   text-align: center;
+}
+</style>
+ 
+<body>
+<div class="top-container">
+  <h1>বাংলাদেশী গাড়ির নিবন্ধন প্লেট সনাক্তকরণ</h1>
+</div>
+    
+    <form method=post enctype=multipart/form-data>
+      <p align = "center" ><input type=file name=file>
+         <input type=submit value=আপলোড>
+    </form>
+
+    <h1 align = "center">ফলাফল:</h1>
+    
+    
+
+<table align = "center">
+  <tr>
+    <th>মূল ছবি</th>
+    <th> নিবন্ধন প্লেট </th> 
+    <th>নিবন্ধন নম্বর</th>
+  </tr>
+  <tr>
+    <td>
+{% if img_src %}
+      <img src="{{ img_src }}" width="300" height="200">
+    {% endif %} 
+</td>
+    <td>{% if img_src1 %}
+      <img id="testimg" src="{{ img_src1}}" width="300" height="200">
+	<!-- <img id="testimg" src="/static/uploads/plate.png" width="300" height="200"> -->
+
+      
+    {% endif %}</td>
+    <td>    {% if extracted_text %}
+      <h1> {{ extracted_text }} </h1>
+    
+    {% else %}
+      The extracted text will be displayed here
+    {% endif %}
+</td>
+  </tr>
+
+</table>
+
+
+<h1 align = "center">ফলাফল:</h1>
+
+
+
+<table align = "center">
+  <tr>
+    <th>মূল ছবি</th>
+    <th> নিবন্ধন প্লেট </th>
+    <th>নিবন্ধন নম্বর</th>
+  </tr>
+  <tr>
+    <td>
+{% if img_src %}
+      <img src="{{ img_src }}" width="300" height="200">
+    {% endif %}
+</td>
+    <td>{% if img_src1 %}
+      <img id="testimg" src="{{ img_src1}}" width="300" height="200">
+	<!-- <img id="testimg" src="/static/uploads/plate.png" width="300" height="200"> -->
+
+
+    {% endif %}</td>
+    <td>    {% if extracted_text %}
+      <h1> {{ extracted_text }} </h1>
+
+    {% else %}
+      The extracted text will be displayed here
+    {% endif %}
+</td>
+  </tr>
+
+</table>
+
+
+
+<div class="footer">
+  <p>তথ্য ও যোগাযোগ প্রযুক্তি বিভাগ, ইসলামি বিশ্ববিদ্যালয়, কুষ্টিয়া, বাংলাদেশ।</p>
+</div>
+
+<script>
+
+// Refresshing the imge link
+// create a new timestamp     
+var timestamp = new Date().getTime();     
+     
+var el = document.getElementById("testimg");     
+     
+// el.src = "/static/uploads/plate.png?t=" + timestamp;
+
+el.src = "{{ img_src1}}?t=" + timestamp; 
+
+
+</script>
+
+
+</body>
+</html>
+    
