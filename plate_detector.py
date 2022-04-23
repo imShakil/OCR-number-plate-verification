@@ -57,17 +57,4 @@ def plate_finder(filename):
 	text = pytesseract.image_to_string(Cropped, lang='ben', config=testdata_dir_config)
 	path = os.path.join(os.getcwd() + '/static/uploads/')
 	cv2.imwrite(path + 'plate.png', Cropped)
-	# print(text)
-	chk = ""
-	txt = text.replace('\n', ' ')
-	print(text.strip())
-	tst = r"ঢাকা মেট্রো-হ ১৫-১৫৬৮"
-	tst = tst.strip()
-	if txt == tst:
-		chk = "\tLegal Vehicle"
-	else:
-		chk = "\tIllegal Vehicle"
-		print(txt)
-		print(tst)
-	return text + chk
-
+	return text
