@@ -1,0 +1,73 @@
+import os
+import cv2
+import imutils
+import numpy as np
+import pytesseract
+from PIL import Image
+
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+testdata_dir_config = r'--tessdata-dir "C:\Program Files\Tesseract-OCR\tessdata"'
+
+
+def plate_finder(filename):
+	p_img = Image.open(filename).convert('RGB')
+	img = np.array(p_img)
+
+	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	gray = cv2.bilateralFilter(gray, 15, 7, 7)
+	edged = cv2.Canny(gray, 30, 200)
+
+
+# find contours in the edged image, keep only the largest
+# ones, and initialize our screen contour
+	cnts = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	cnts = imutils.grab_contours(cnts)
+	cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
+	screenCnt = None
+
+	# loop over our contours
+	for c in cnts:
+		peri = cv2.arcLength(c, True)
+		approx = cv2.approxPolyDP(c, 0.018 * peri, True)
+		# if our approximated contour has four points, then
+		# we can assume that we have found our screen
+		if len(approx) == 4:
+			screenCnt = approx
+			break
+
+	if screenCnt is None:
+		detected = 0
+		print("No contour detected")
+	else:
+		detected = 1
+
+	if detected == 1:
+		cv2.drawContours(img, [screenCnt], -1, (0, 255, 0), 3)
+
+	# Masking the part other than the number plate
+	mask = np.zeros(gray.shape, np.uint8)
+	new_image = cv2.drawContours(mask, [screenCnt], 0, 255, -1,)
+	new_image = cv2.bitwise_and(img, img, mask=mask)
+
+	# Now crop
+	x, y = np.where(mask == 255)
+	topx, topy = np.min(x), np.min(y)
+	bottomx, bottomy = np.max(x), np.max(y)
+	Cropped = gray[topx:bottomx+1, topy:bottomy+1]
+	text = pytesseract.image_to_string(Cropped, lang='ben', config=testdata_dir_config)
+	path = os.path.join(os.getcwd() + '/static/uploads/')
+	cv2.imwrite(path + 'plate.png', Cropped)
+	# print(text)
+	chk = ""
+	txt = text.replace('\n', ' ')
+	print(text.strip())
+	tst = r"ঢাকা মেট্রো-হ ১৫-১৫৬৮"
+	tst = tst.strip()
+	if txt == tst:
+		chk = "\tLegal Vehicle"
+	else:
+		chk = "\tIllegal Vehicle"
+		print(txt)
+		print(tst)
+	return text + chk
+
